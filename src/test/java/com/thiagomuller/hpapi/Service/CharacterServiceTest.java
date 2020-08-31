@@ -256,28 +256,4 @@ public class CharacterServiceTest {
 		characterService.deleteAllCharacters();
 		verify(characterRepository, times(1)).deleteAll();
 	}
-	
-	@Test
-	@Tag("UnitTest")
-	public void givenCachingWhenCallingPotterApiThenItShouldCallItTwice() throws NoHousesFoundException, NoCharactersFoundException, InvalidHouseIdException {
-		List<String> potterApiHouses = new ArrayList<String>() {{
-			add("5a05e2b252f721a3cf2ea33f");
-			add("5a05da69d45bd0a11bd5e06f");
-			add("5a05dc8cd45bd0a11bd5e071");
-			add("5a05dc58d45bd0a11bd5e070");
-		}};
-		List<Character> validCharacters = new ArrayList<Character>(){{
-			add(hermione);
-			add(rony);
-			add(harry);
-		}};
-		when(houseFinder.findAllHouses()).thenReturn(potterApiHouses);
-		when(characterRepository.findCharactersByHouseId("5a05e2b252f721a3cf2ea33f")).
-		thenReturn(validCharacters);
-		when(characterRepository.findCharactersByHouseId("5a05da69d45bd0a11bd5e06f")).
-		thenReturn(validCharacters);
-		characterService.getAllCharactersFromGivenHouse("5a05e2b252f721a3cf2ea33f");
-		characterService.getAllCharactersFromGivenHouse("5a05da69d45bd0a11bd5e06f");
-		verify(houseFinder, times(1)).findAllHouses();
-	}
 }

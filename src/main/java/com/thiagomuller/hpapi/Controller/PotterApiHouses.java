@@ -38,7 +38,7 @@ public class PotterApiHouses implements HouseFinder{
 	@Override
 	public List<String> findAllHouses() throws NoHousesFoundException{			
 		List<String> potterApiHouseIds = new ArrayList<>();
-		List<House> potterApiHouses = handleHttpCallToPotterApi();
+		List<House> potterApiHouses = getHousesListFromApi();
 		if(potterApiHouses.isEmpty())
 			throw new NoHousesFoundException("No houses were found at Potter api");
 		for(House house : potterApiHouses)
@@ -46,7 +46,7 @@ public class PotterApiHouses implements HouseFinder{
 		return potterApiHouseIds;	
 	}
 	
-	private List<House> handleHttpCallToPotterApi() throws NoHousesFoundException{
+	private List<House> getHousesListFromApi() throws NoHousesFoundException{
 		Integer numberOfRetries = Integer.valueOf(potterApiConfig.getNumberOfRetries());
 		HttpResponse<String> potterApiResponse = callPotterApi(numberOfRetries);
 		try {

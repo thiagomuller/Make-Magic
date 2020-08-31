@@ -10,7 +10,7 @@ import com.thiagomuller.hpapi.Controller.PotterApiHouses;
 
 @Profile("test")
 @Configuration
-public class PotterApiHousesTestConfiguration {
+public class PotterApiHousesMockConfiguration {
 	
 	@Bean
 	@Primary
