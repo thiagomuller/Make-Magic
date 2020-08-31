@@ -1,6 +1,5 @@
 package com.thiagomuller.hpapi.Controller;
 
-import java.awt.print.Book;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.thiagomuller.hpapi.Exception.CharacterNotFoundException;
 import com.thiagomuller.hpapi.Exception.InvalidHouseIdException;
 import com.thiagomuller.hpapi.Exception.NoCharactersFoundException;
-import com.thiagomuller.hpapi.Exception.NoHousesFoundException;
 import com.thiagomuller.hpapi.Model.Character;
 import com.thiagomuller.hpapi.Service.CharacterService;
 
@@ -46,11 +44,10 @@ public class CharacterController {
 			  @ApiResponse(responseCode = "201", description = "Character created", 
 				    content = { @Content(mediaType = "application/json", 
 			      schema = @Schema(implementation = Character.class)) }),
-			  @ApiResponse(responseCode = "400", description = "Invalid house id supplied"),
-			  @ApiResponse(responseCode = "404", description = "No houses were found at Potter api")
+			  @ApiResponse(responseCode = "400", description = "Invalid house id supplied")
 	})
 	@PostMapping
-	public ResponseEntity createCharacter(@Valid @RequestBody Character character) throws InvalidHouseIdException, NoHousesFoundException{
+	public ResponseEntity createCharacter(@Valid @RequestBody Character character) throws InvalidHouseIdException{
 		Character createdCharacter = characterService.createOrUpdateCharacter(character);
 		return new ResponseEntity(createdCharacter, HttpStatus.CREATED);
 	}
@@ -62,11 +59,10 @@ public class CharacterController {
 					content = { @Content(mediaType = "application/json",
 					schema = @Schema(implementation = Character.class)) 
 			}),
-			@ApiResponse(responseCode = "400", description = "Invalid house id supplied"),
-			@ApiResponse(responseCode = "404", description = "No houses were found at Potter api")
+			@ApiResponse(responseCode = "400", description = "Invalid house id supplied")
 	})
 	@PutMapping
-	public ResponseEntity updateCharacter(@Valid @RequestBody Character character) throws InvalidHouseIdException, NoHousesFoundException{
+	public ResponseEntity updateCharacter(@Valid @RequestBody Character character) throws InvalidHouseIdException{
 		Character updatedCharacter = characterService.createOrUpdateCharacter(character);
 		return new ResponseEntity(updatedCharacter, HttpStatus.OK);
 	}
@@ -77,8 +73,10 @@ public class CharacterController {
 			@ApiResponse(responseCode = "400", description = "No character found for this character id")
 	})
 	@GetMapping("/{characterId}")
-	public ResponseEntity getChracterById(@PathVariable Integer characterId) throws CharacterNotFoundException{
-		Character character = characterService.getCharacterById(characterId);
+	public ResponseEntity getChracterById(@PathVariable Integer characterId){
+		Optional<Character> character = characterService.getCharacterById(characterId);
+		if(character.isEmpty())
+			return new ResponseEntity("No character found for this character id", HttpStatus.BAD_REQUEST);
 		return new ResponseEntity(character, HttpStatus.FOUND);
 	}
 	
@@ -86,17 +84,20 @@ public class CharacterController {
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "302", description = "Characters found"),
 			@ApiResponse(responseCode = "400", description = "Invalid house id supplied"),
-			@ApiResponse(responseCode = "404", description = "No houses were found at Potter api")
+			@ApiResponse(responseCode = "404", description = "No characters found")
 	})
 	@GetMapping
-	public ResponseEntity getAllCharacters(@RequestParam Optional<String> house) throws NoCharactersFoundException, NoHousesFoundException, InvalidHouseIdException{
+	public ResponseEntity getAllCharacters(@RequestParam Optional<String> house) throws InvalidHouseIdException{
 		List<Character> characters = new ArrayList<>();
 		if(!house.isEmpty()) {
 			characters = characterService.getAllCharactersFromGivenHouse(house.get());
+			if(characters.isEmpty())
+				return new ResponseEntity(characters, HttpStatus.NOT_FOUND);
 			return new ResponseEntity(characters, HttpStatus.FOUND);
-		}
-			
+		}	
 		characters = characterService.getAllCharacters();
+		if(characters.isEmpty())
+			return new ResponseEntity(characters, HttpStatus.NOT_FOUND);
 		return new ResponseEntity(characters, HttpStatus.FOUND);
 	}
 	
@@ -121,7 +122,7 @@ public class CharacterController {
 	@DeleteMapping
 	public ResponseEntity deleteAllCharacters() throws NoCharactersFoundException{
 		characterService.deleteAllCharacters();
-		return new ResponseEntity("All characters deleted", HttpStatus.OK);
+		return new ResponseEntity("Characters deleted", HttpStatus.OK);
 	}
 	
 }

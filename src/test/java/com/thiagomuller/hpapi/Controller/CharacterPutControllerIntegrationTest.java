@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
@@ -21,7 +20,6 @@ import org.springframework.test.context.ActiveProfiles;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thiagomuller.hpapi.Exception.InvalidHouseIdException;
-import com.thiagomuller.hpapi.Exception.NoHousesFoundException;
 import com.thiagomuller.hpapi.Model.Character;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -52,7 +50,7 @@ public class CharacterPutControllerIntegrationTest {
 	
 	@Test
 	@Tag("IntegrationTest")
-	public void givenAValidCharacterJsonWhenCallingCharacterPutThenItShouldUpdateItAndReturnIt() throws JsonProcessingException, JSONException, NoHousesFoundException, InvalidHouseIdException{
+	public void givenAValidCharacterJsonWhenCallingCharacterPutThenItShouldUpdateItAndReturnIt() throws JsonProcessingException, JSONException, InvalidHouseIdException{
 		when(potterApi.findAllHouses()).thenReturn(validHouses);
 		String hermioneJson = jsonHandler.createCharacterJsonForPosting("Hermione Granger", "Student", "Hogwarts School of Witchcraft and Wizardry", 
 				"5a05e2b252f721a3cf2ea33f", "Otter", "Muggle-Born");
@@ -70,7 +68,7 @@ public class CharacterPutControllerIntegrationTest {
 	
 	@Test
 	@Tag("IntegrationTest")
-	public void givenAnInvalidCharacterJsonWhenCallingPutThenItShouldReturnHttpStatus400() throws JSONException, NoHousesFoundException, InvalidHouseIdException{
+	public void givenAnInvalidCharacterJsonWhenCallingPutThenItShouldReturnHttpStatus400() throws JSONException, InvalidHouseIdException{
 		when(potterApi.findAllHouses()).thenReturn(validHouses);
 		String hermioneJson = jsonHandler.createCharacterJsonForPosting("Hermione Granger", "Student", "Hogwarts School of Witchcraft and Wizardry", "5a05e2b252f721a3cf2ea33f", "Otter", "Muggle-Born");
 		ResponseEntity<Character> postControllerResponse = httpHandler.postGivenJson(hermioneJson, characterUrl);

@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import com.thiagomuller.hpapi.Exception.CharacterNotFoundException;
 import com.thiagomuller.hpapi.Exception.InvalidHouseIdException;
 import com.thiagomuller.hpapi.Exception.NoCharactersFoundException;
-import com.thiagomuller.hpapi.Exception.NoHousesFoundException;
 import com.thiagomuller.hpapi.Exception.ValidationErrorResponse;
 import com.thiagomuller.hpapi.Exception.Violation;
 
@@ -32,20 +31,12 @@ public class ErrorHandlingController {
 	    }
 	    return error;
 	  }
-
 	  
 	  @ExceptionHandler(InvalidHouseIdException.class)
 	  @ResponseStatus(HttpStatus.BAD_REQUEST)
 	  @ResponseBody
 	  public ResponseEntity onInvalidHouseIdException(InvalidHouseIdException houseNotFoundEx) {
 		  return new ResponseEntity(houseNotFoundEx.getMessage(), HttpStatus.BAD_REQUEST);
-	  }
-	  
-	  @ExceptionHandler(NoHousesFoundException.class)
-	  @ResponseStatus(HttpStatus.BAD_REQUEST)
-	  @ResponseBody
-	  public ResponseEntity onNoHousesFoundException(NoHousesFoundException noHousesFoundEx) {
-		  return new ResponseEntity(noHousesFoundEx.getMessage(), HttpStatus.NOT_FOUND);
 	  }
 	  
 	  @ExceptionHandler(CharacterNotFoundException.class)

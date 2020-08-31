@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thiagomuller.hpapi.Exception.InvalidHouseIdException;
 import com.thiagomuller.hpapi.Exception.NoCharacterFoundException;
 import com.thiagomuller.hpapi.Exception.NoCharactersFoundException;
-import com.thiagomuller.hpapi.Exception.NoHousesFoundException;
 import com.thiagomuller.hpapi.Model.Character;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -53,7 +52,7 @@ public class CharacterGetControllerIntegrationTest {
 	
 	@Test
 	@Tag("IntegrationTest")
-	public void givenMulttipleCharactersInDbWhenGetAllCharactersCalledWithoutHouseThenItShouldReturnAllCharacters() throws JSONException, NoCharacterFoundException, NoHousesFoundException, InvalidHouseIdException{
+	public void givenMulttipleCharactersInDbWhenGetAllCharactersCalledWithoutHouseThenItShouldReturnAllCharacters() throws JSONException, NoCharacterFoundException, InvalidHouseIdException{
 		when(potterApi.findAllHouses()).thenReturn(validHouses);
 		String hermionePostingJson = jsonHandler.createCharacterJsonForPosting("Hermione Granger", "Student", "Hogwarts School of Witchcraft and Wizardry", 
 				"5a05e2b252f721a3cf2ea33f", "Otter", "Muggle-Born");
@@ -83,7 +82,7 @@ public class CharacterGetControllerIntegrationTest {
 	
 	@Test
 	@Tag("IntegrationTest")
-	public void givenCharactersFromDifferentHousesInDbWhenGetCharactersByHouseIdGetsCalledWithValidHouseIdThenItShouldReturnCharactersFromThatHouse() throws JSONException, NoCharactersFoundException, NoHousesFoundException, InvalidHouseIdException{
+	public void givenCharactersFromDifferentHousesInDbWhenGetCharactersByHouseIdGetsCalledWithValidHouseIdThenItShouldReturnCharactersFromThatHouse() throws JSONException, NoCharactersFoundException, InvalidHouseIdException{
 		when(potterApi.findAllHouses()).thenReturn(validHouses);
 		String hermionePostingJson = jsonHandler.createCharacterJsonForPosting("Hermione Granger", "Student", "Hogwarts School of Witchcraft and Wizardry", 
 				"5a05e2b252f721a3cf2ea33f", "Otter", "Muggle-Born");
@@ -110,7 +109,7 @@ public class CharacterGetControllerIntegrationTest {
 	
 	@Test
 	@Tag("IntegrationTest")
-	public void givenCharactersFromDifferentHousesOnDbWhenGetCharactersByHouseIdGetsCalledWithInValidHouseIdThenItShouldReturnHttp400() throws JSONException, NoHousesFoundException, InvalidHouseIdException{
+	public void givenCharactersFromDifferentHousesOnDbWhenGetCharactersByHouseIdGetsCalledWithInValidHouseIdThenItShouldReturnHttp400() throws JSONException, InvalidHouseIdException{
 		when(potterApi.findAllHouses()).thenReturn(validHouses);
 		String hermionePostingJson = jsonHandler.createCharacterJsonForPosting("Hermione Granger", "Student", "Hogwarts School of Witchcraft and Wizardry", "5a05e2b252f721a3cf2ea33f", "Otter", "Muggle-Born");
 		String harryPostingJson = jsonHandler.createCharacterJsonForPosting("Severus Snape", "Professor", "Hogwarts School of Witchcraft and Wizardry", "5a05dc8cd45bd0a11bd5e071", "Doe", "Pure-Blood");
@@ -129,7 +128,7 @@ public class CharacterGetControllerIntegrationTest {
 	
 	@Test
 	@Tag("IntegrationTest")
-	public void givenCharacterFromAGivenIdInDbWhenGetCharacterByIdWithValidIdCalledThenItShouldReturnIt() throws JsonProcessingException, JSONException, NoHousesFoundException, InvalidHouseIdException{
+	public void givenCharacterFromAGivenIdInDbWhenGetCharacterByIdWithValidIdCalledThenItShouldReturnIt() throws JsonProcessingException, JSONException, InvalidHouseIdException{
 		when(potterApi.findAllHouses()).thenReturn(validHouses);
 		String hermionePostingJson = jsonHandler.createCharacterJsonForPosting("Hermione Granger", "Student", "Hogwarts School of Witchcraft and Wizardry", "5a05e2b252f721a3cf2ea33f", "Otter", "Muggle-Born");
 		ResponseEntity<Character> postControllerResponse = httpHandler.postGivenJson(hermionePostingJson, characterUrl);

@@ -10,6 +10,7 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.ApplicationListener;
 
 @SpringBootApplication
+@EnableCaching
 public class HpapiApplication {
 	
   static class EnvironmentPrepared implements ApplicationListener<ApplicationEnvironmentPreparedEvent>{

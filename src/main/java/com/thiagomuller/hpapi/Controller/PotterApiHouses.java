@@ -14,10 +14,8 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thiagomuller.hpapi.Config.PotterApiConfiguration;
-import com.thiagomuller.hpapi.Exception.NoHousesFoundException;
 import com.thiagomuller.hpapi.Model.House;
 import com.thiagomuller.hpapi.Service.HouseFinder;
 
@@ -36,19 +34,19 @@ public class PotterApiHouses implements HouseFinder{
 	
 
 	@Override
-	public List<String> findAllHouses() throws NoHousesFoundException{			
+	public List<String> findAllHouses(){			
 		List<String> potterApiHouseIds = new ArrayList<>();
 		List<House> potterApiHouses = getHousesListFromApi();
-		if(potterApiHouses.isEmpty())
-			throw new NoHousesFoundException("No houses were found at Potter api");
 		for(House house : potterApiHouses)
 			potterApiHouseIds.add(house.getHouseId());
 		return potterApiHouseIds;	
 	}
 	
-	private List<House> getHousesListFromApi() throws NoHousesFoundException{
+	private List<House> getHousesListFromApi(){
 		Integer numberOfRetries = Integer.valueOf(potterApiConfig.getNumberOfRetries());
 		HttpResponse<String> potterApiResponse = callPotterApi(numberOfRetries);
+		if(potterApiResponse == null)
+			return new ArrayList<House>();
 		try {
 			return mapper.readValue(potterApiResponse.body(), new TypeReference<List<House>>() {});
 		}catch (JsonProcessingException json) {
@@ -57,10 +55,10 @@ public class PotterApiHouses implements HouseFinder{
 			if(retriesDoneSoFar < numberOfRetries)
 				callPotterApi(numberOfRetries);
 		}
-		throw new NoHousesFoundException("No houses were found at Potter api");
+		return new ArrayList<House>();
 	}
 	
-	private HttpResponse<String> callPotterApi(Integer numberOfRetries) throws NoHousesFoundException{
+	private HttpResponse<String> callPotterApi(Integer numberOfRetries){
 		HttpClient client = HttpClient.newHttpClient();
 		HttpRequest request = HttpRequest.newBuilder(URI.create(potterApiConfig.getHouseUrl() 
 				+ potterApiConfig.getApiKey())).build();
@@ -79,6 +77,6 @@ public class PotterApiHouses implements HouseFinder{
 		}catch (IOException io) {
 			io.printStackTrace();
 		}
-		throw new NoHousesFoundException("No houses were found at Potter api");
+		return null;
 	}
 }

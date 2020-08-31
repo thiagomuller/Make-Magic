@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.hibernate.mapping.Collection;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -23,7 +24,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.thiagomuller.hpapi.Exception.CharacterNotFoundException;
 import com.thiagomuller.hpapi.Exception.InvalidHouseIdException;
 import com.thiagomuller.hpapi.Exception.NoCharactersFoundException;
-import com.thiagomuller.hpapi.Exception.NoHousesFoundException;
 import com.thiagomuller.hpapi.Model.Character;
 import com.thiagomuller.hpapi.Repository.CharacterRepository;
 
@@ -89,23 +89,17 @@ public class CharacterServiceTest {
 	@Test
 	@Tag("UnitTest")
 	public void givenInvalidHouseIdWhenPostNewCharacterThenItShouldThrowInvalidHouseIdException() {
-		try {
-			hermione.setHouseId("123");
-			when(houseFinder.findAllHouses()).thenReturn(new ArrayList<String>());	
-			Exception exception = assertThrows(InvalidHouseIdException.class, () -> {
-				characterService.createOrUpdateCharacter(hermione);
-			});
-			verify(houseFinder, times(1)).findAllHouses();
-			
-			String expectedMessage = "Invalid house id";
-		    String actualMessage = exception.getMessage();
-		 
-		    assertEquals(expectedMessage, actualMessage);
-		}catch (NoHousesFoundException noHousesEx) {
-			noHousesEx.printStackTrace();
-		}finally {
-			hermione.setHouseId("5a05e2b252f721a3cf2ea33f");
-		}
+		hermione.setHouseId("123");
+		when(houseFinder.findAllHouses()).thenReturn(new ArrayList<String>());	
+		Exception exception = assertThrows(InvalidHouseIdException.class, () -> {
+			characterService.createOrUpdateCharacter(hermione);
+		});
+		verify(houseFinder, times(1)).findAllHouses();
+		
+		String expectedMessage = "Invalid house id";
+	    String actualMessage = exception.getMessage();
+	 
+	    assertEquals(expectedMessage, actualMessage);
 	}
 	
 	@Test
@@ -116,8 +110,6 @@ public class CharacterServiceTest {
 			when(characterRepository.save(hermione)).thenReturn(hermione);
 			characterService.createOrUpdateCharacter(hermione);
 			verify(characterRepository, times(1)).save(hermione);
-		}catch (NoHousesFoundException noHousesEx) {
-			noHousesEx.printStackTrace();
 		}catch(InvalidHouseIdException invalidHouseEx) {
 			invalidHouseEx.printStackTrace();
 		}
@@ -125,33 +117,31 @@ public class CharacterServiceTest {
 	
 	@Test
 	@Tag("UnitTest")
-	public void givenValidIdWhenGetCharacterByIdThenItShouldReturnCharacter() throws CharacterNotFoundException{
-		when(characterRepository.findById(1)).thenReturn(Optional.of(hermione));
-		Character foundCharacter = characterService.getCharacterById(1);
-		verify(characterRepository, times(1)).findById(1);
-		assertEquals(hermione, foundCharacter);
-		
+	public void givenSomeCharactersFromRepositoryWhenGetAllCharactersCalledThenItShouldReturnSameCharactersInList() {
+		List<Character> characters = new ArrayList<>();
+		characters.add(hermione);
+		characters.add(rony);
+		when(characterRepository.findAll()).thenReturn(characters);
+		List<Character> foundCharacters = characterService.getAllCharacters();
+		for(int i = 0; i < characters.size(); i ++) {
+			assertEquals(characters.get(i).getName(), foundCharacters.get(i).getName());
+		}
+		verify(characterRepository, times(1)).findAll();
 	}
 	
 	@Test
 	@Tag("UnitTest")
-	public void givenInvalidIdWhenGetCharacterByIdThenIShouldThrowCharacterNotFoundException() {
-		when(characterRepository.findById(1)).thenReturn(Optional.empty());
-		Exception exception = assertThrows(CharacterNotFoundException.class, () -> {
-			characterService.getCharacterById(1);
-		});
-		
-		verify(characterRepository, times(1)).findById(1);
-		String expectedMessage = "No character found with id 1";
-		String actualMessage = exception.getMessage();
-		
-		assertEquals(expectedMessage, actualMessage);
+	public void givenEmptyResponseFromRepositoryWhenGetAllCharactersCalledThenItShouldReturnEmptyList() {
+		Iterable<Character> characters = new ArrayList<Character>();
+		when(characterRepository.findAll()).thenReturn(characters);
+		List<Character> foundCharacters = characterService.getAllCharacters();
+		assertEquals(0, foundCharacters.size());
 	}
 	
 	@Test
 	@Tag("UnitTest")
-	public void givenDbWithSeveralCharactersWhenGetCharactersByHouseWithValidHouseIdThenShouldReturnCharacters() 
-			throws NoCharactersFoundException, NoHousesFoundException, InvalidHouseIdException{
+	public void givenDbWithSeveralCharactersWhenGetCharactersByHouseWithValidHouseIdThenShouldCallRepository() 
+			throws NoCharactersFoundException, InvalidHouseIdException{
 		List<Character> gryffyndorCharacters = new ArrayList<>();
 		gryffyndorCharacters.add(harry);
 		gryffyndorCharacters.add(hermione);
@@ -167,7 +157,7 @@ public class CharacterServiceTest {
 	@Test
 	@Tag("UnitTest")
 	public void givenDbWithSeveralCharactersWhenGetCharactersByHouseWithInvalidHouseIdthenItShouldThrowInvalidHouseIdException() 
-			throws InvalidHouseIdException, NoHousesFoundException{
+			throws InvalidHouseIdException{
 		when(houseFinder.findAllHouses()).thenReturn(new ArrayList());
 		Exception exception = assertThrows(InvalidHouseIdException.class, () -> {
 			characterService.getAllCharactersFromGivenHouse("5a05e2b252f721a3cf2ea33f");
@@ -180,29 +170,7 @@ public class CharacterServiceTest {
 		assertEquals(expectedMessage, actualMessage);
 	}
 	
-	@Test
-	@Tag("UnitTest")
-	public void givenDbHasCharactersWhenGetAllCharactersThenItShouldCallRepository() {
-		List<Character> characters = new ArrayList<>();
-		characters.add(hermione);
-		when(characterRepository.findAll()).thenReturn(characters);
-		characterRepository.findAll();
-		verify(characterRepository, times(1)).findAll();
-	}
 	
-	@Test
-	@Tag("UnitTest")
-	public void givenDbNoCharactersWhenGetAllCharactersThenShouldThrowNoCharactersFoundException() {
-		List<Character> characters = new ArrayList<>();
-		when(characterRepository.findAll()).thenReturn(characters);
-		Exception exception = assertThrows(NoCharactersFoundException.class , () -> {
-			characterService.getAllCharacters();
-		});
-		String expectedMessage = "No characters found";
-	    String actualMessage = exception.getMessage();
-	    assertEquals(expectedMessage, actualMessage);
-		
-	}
 	
 	@Test
 	@Tag("UnitTest")
@@ -213,7 +181,7 @@ public class CharacterServiceTest {
 		});
 		
 		verify(characterRepository, times(1)).findById(1);
-		String expectedMessage = "Character with id 1 not found";
+		String expectedMessage = "Character not found";
 	    String actualMessage = exception.getMessage();
 	 
 	    assertEquals(expectedMessage, actualMessage);
@@ -240,7 +208,7 @@ public class CharacterServiceTest {
 		});
 		
 		verify(characterRepository, times(1)).findAll();
-		String expectedMessage = "No characters were found";
+		String expectedMessage = "No characters found";
 	    String actualMessage = exception.getMessage();
 	 
 	    assertEquals(expectedMessage, actualMessage);

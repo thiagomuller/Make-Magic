@@ -19,7 +19,6 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thiagomuller.hpapi.Exception.InvalidHouseIdException;
-import com.thiagomuller.hpapi.Exception.NoHousesFoundException;
 import com.thiagomuller.hpapi.Model.Character;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -49,7 +48,7 @@ public class CharacterDeleteControllerIntegrationTest {
 	
 	@Test
 	@Tag("IntegrationTest")
-	public void givenCharacterPresentWhenDeleteByIdWithValidIdThenShouldReturnHttp200() throws JSONException, NoHousesFoundException, InvalidHouseIdException{
+	public void givenCharacterPresentWhenDeleteByIdWithValidIdThenShouldReturnHttp200() throws JSONException, InvalidHouseIdException{
 		when(potterApi.findAllHouses()).thenReturn(validHouses);
 		String hermionePostingJson = jsonHandler.createCharacterJsonForPosting("Hermione Granger", "Student", "Hogwarts School of Witchcraft and Wizardry", 
 				"5a05e2b252f721a3cf2ea33f", "Otter", "Muggle-Born");
@@ -68,7 +67,7 @@ public class CharacterDeleteControllerIntegrationTest {
 	
 	@Test
 	@Tag("IntegrationTest")
-	public void givenDbHasCharactersWhenDeleteAllCharactersThenShouldReturnHttp200() throws JSONException,  NoHousesFoundException, InvalidHouseIdException{
+	public void givenDbHasCharactersWhenDeleteAllCharactersThenShouldReturnHttp200() throws JSONException, InvalidHouseIdException{
 		when(potterApi.findAllHouses()).thenReturn(validHouses);
 		String hermionePostingJson = jsonHandler.createCharacterJsonForPosting("Hermione Granger", "Student", "Hogwarts School of Witchcraft and Wizardry", 
 				"5a05e2b252f721a3cf2ea33f", "Otter", "Muggle-Born");

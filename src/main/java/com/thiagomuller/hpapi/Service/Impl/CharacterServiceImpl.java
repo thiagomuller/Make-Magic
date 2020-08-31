@@ -12,13 +12,15 @@ import org.springframework.stereotype.Service;
 import com.thiagomuller.hpapi.Exception.CharacterNotFoundException;
 import com.thiagomuller.hpapi.Exception.InvalidHouseIdException;
 import com.thiagomuller.hpapi.Exception.NoCharactersFoundException;
-import com.thiagomuller.hpapi.Exception.NoHousesFoundException;
 import com.thiagomuller.hpapi.Model.Character;
 import com.thiagomuller.hpapi.Repository.CharacterRepository;
 import com.thiagomuller.hpapi.Service.CharacterService;
 import com.thiagomuller.hpapi.Service.HouseFinder;
 
+import lombok.extern.java.Log;
+
 @Service
+@Log
 public class CharacterServiceImpl implements CharacterService{
 	
 	@Autowired
@@ -28,16 +30,16 @@ public class CharacterServiceImpl implements CharacterService{
 	private HouseFinder houseFinder;
 
 	@Override
-	public Character createOrUpdateCharacter(Character character) throws InvalidHouseIdException, NoHousesFoundException{
+	public Character createOrUpdateCharacter(Character character) throws InvalidHouseIdException{
 		validateHouseId(character.getHouseId());
 		return characterRepository.save(character);
 	}
 
 	@Override
-	public List<Character> getAllCharacters() throws NoCharactersFoundException{
+	public List<Character> getAllCharacters(){
 		Iterable<Character> foundCharacters = characterRepository.findAll();
 		if(getIterableSize(foundCharacters) == 0)
-			throw new NoCharactersFoundException("No characters found");
+			return new ArrayList<Character>();
 		List<Character> characters = new ArrayList<>();
 		for(Character character : foundCharacters)
 			characters.add(character);
@@ -45,19 +47,16 @@ public class CharacterServiceImpl implements CharacterService{
 	}
 	
 	@Override
-	public Character getCharacterById(Integer characterId) throws CharacterNotFoundException {
-		Optional<Character> foundCharacter = characterRepository.findById(characterId);
-		if(foundCharacter.isEmpty())
-			throw new CharacterNotFoundException(String.format("No character found with id %d", characterId));
-		return foundCharacter.get();
+	public Optional<Character> getCharacterById(Integer characterId){
+		return characterRepository.findById(characterId);
 	}
 
 	@Override
-	public List<Character> getAllCharactersFromGivenHouse(String houseId) throws InvalidHouseIdException, NoHousesFoundException, NoCharactersFoundException{
+	public List<Character> getAllCharactersFromGivenHouse(String houseId) throws InvalidHouseIdException{
 		validateHouseId(houseId);
 		List<Character> charactersForGivenHouse = characterRepository.findCharactersByHouseId(houseId);
 		if(charactersForGivenHouse.isEmpty())
-			throw new NoCharactersFoundException(String.format("No characters found for house id %s", houseId));
+			return new ArrayList<Character>();
 		return charactersForGivenHouse;
 	}
 
@@ -65,7 +64,7 @@ public class CharacterServiceImpl implements CharacterService{
 	public void deleteCharacterById(Integer characterId) throws CharacterNotFoundException {
 		Optional<Character> character = characterRepository.findById(characterId);
 		if(character.isEmpty())
-			throw new CharacterNotFoundException(String.format("Character with id %d not found", 
+			throw new CharacterNotFoundException(String.format("Character not found", 
 					characterId));
 		characterRepository.delete(character.get());
 	}
@@ -74,7 +73,7 @@ public class CharacterServiceImpl implements CharacterService{
 	public void deleteAllCharacters() throws NoCharactersFoundException {
 		Iterable<Character> foundCharacters = characterRepository.findAll();
 		if(getIterableSize(foundCharacters) == 0)
-			throw new NoCharactersFoundException("No characters were found");
+			throw new NoCharactersFoundException("No characters found");
 		List<Character> characters = new ArrayList<>();
 		for(Character character : foundCharacters) {
 			characters.add(character);
@@ -82,14 +81,15 @@ public class CharacterServiceImpl implements CharacterService{
 		characterRepository.deleteAll();
 	}
 	
-	private void validateHouseId(String houseId) throws NoHousesFoundException, InvalidHouseIdException{
+	private void validateHouseId(String houseId) throws InvalidHouseIdException{
 		List<String> potterApiHouseIds = getAllHouses();
 		if(!potterApiHouseIds.contains(houseId))
 			throw new InvalidHouseIdException("Invalid house id");
 	}
 	
 	@Cacheable("housesCache")
-	private List<String> getAllHouses() throws NoHousesFoundException{
+	private List<String> getAllHouses(){
+		log.info("CALLING POTTER API");
 		return houseFinder.findAllHouses();
 	}
 	
