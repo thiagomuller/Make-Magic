@@ -1,0 +1,149 @@
+{
+	"info": {
+		"_postman_id": "a644d663-ab44-4eb1-a017-07ea3985d940",
+		"name": "HpApi",
+		"description": "Harry Potter api for characters CRUD\nHouse id is validated against Potter Api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Character",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\" : \"Harry Potter\",\n    \"role\" : \"Student\",\n    \"school\" : \"Hogwarts School of Witchcraft and Wizardry\",\n    \"houseId\" : \"5a05dc8cd45bd0a11bd5e071\",\n    \"patronus\" : \"Deer\",\n    \"bloodStatus\" : \"Pure-Blood\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/characters",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"characters"
+					]
+				},
+				"description": "Creates a single character"
+			},
+			"response": []
+		},
+		{
+			"name": "Update Character",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"characterId\": 1,\n    \"name\": \"Tom Riddle\",\n    \"role\": \"Student\",\n    \"school\": \"Hogwarts School of Witchcraft and Wizardry\",\n    \"houseId\": \"5a05dc8cd45bd0a11bd5e071\",\n    \"patronus\": \"Snake\",\n    \"bloodStatus\": \"Pure-Blood\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/characters",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"characters"
+					]
+				},
+				"description": "Updates a single character"
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Characters",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/characters?house=5a05dc8cd45bd0a11bd5e071",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"characters"
+					],
+					"query": [
+						{
+							"key": "house",
+							"value": "5a05dc8cd45bd0a11bd5e071"
+						}
+					]
+				},
+				"description": "Get all current characters without query params\nWith houseId as query param, gets all characters for that house"
+			},
+			"response": []
+		},
+		{
+			"name": "Get a Single Character",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/characters/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"characters",
+						"1"
+					]
+				},
+				"description": "Gets a single character from its it at path"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete a single character",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/characters/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"characters",
+						"1"
+					]
+				},
+				"description": "Deletes a single character from its Id on the path"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete all characters",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": ""
+				},
+				"description": "Delete all curently registered characters"
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
