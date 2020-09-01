@@ -1,0 +1,23 @@
+version: '3.1'
+services:
+  app:
+    container_name: hpapi
+    image: hpapi
+    build: ./
+    ports:
+      - "8080:8080"
+    depends_on:
+      - dbpostgresql
+    environment:
+      - potterApiHouseUrl=https://www.potterapi.com/v1/houses?key=
+      - potterApiKey=$potterApiKey
+      - numberOfRetries=3
+      - dbUrl=jdbc:postgresql://dbpostgresql/hpapidb
+      - dbUsername=postgres
+      - dbPassword=password
+  dbpostgresql:
+    image: postgres
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=hpapidb
