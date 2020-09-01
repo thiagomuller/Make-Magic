@@ -37,7 +37,7 @@ public class ErrorHandlingController {
 	  @ResponseStatus(HttpStatus.BAD_REQUEST)
 	  @ResponseBody
 	  public ResponseEntity onCharacterNameAlreadyExistsException(CharacterNameAlreadyExistsException characterNameAlreadyExists) {
-		  return new ResponseEntity(characterNameAlreadyExists.getMessage(), HttpStatus.BAD_REQUEST);
+		  return new ResponseEntity(characterNameAlreadyExists.getMessage(), HttpStatus.FORBIDDEN);
 	  }
 	  
 	  @ExceptionHandler(InvalidHouseIdException.class)

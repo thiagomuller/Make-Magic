@@ -46,7 +46,7 @@ public class CharacterController {
 				    content = { @Content(mediaType = "application/json", 
 			      schema = @Schema(implementation = Character.class)) }),
 			  @ApiResponse(responseCode = "400", description = "Invalid house id supplied"),
-			  @ApiResponse(responseCode = "400", description = "Character name already exists")
+			  @ApiResponse(responseCode = "403", description = "Character name already exists")
 	})
 	@PostMapping
 	public ResponseEntity createCharacter(@Valid @RequestBody Character character) throws InvalidHouseIdException, CharacterNameAlreadyExistsException{
@@ -57,7 +57,7 @@ public class CharacterController {
 	@Operation(summary = "Update a single character, character house id is validated at Potter Api:"
 			+ "https://www.potterapi.com/")
 	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "Character updated",
+			@ApiResponse(responseCode = "200",
 					content = { @Content(mediaType = "application/json",
 					schema = @Schema(implementation = Character.class)) 
 			}),
@@ -96,7 +96,7 @@ public class CharacterController {
 		List<Character> characters = new ArrayList<>();
 		characters = characterService.getAllCharacters();
 		if(characters.isEmpty())
-			return new ResponseEntity(characters, HttpStatus.NOT_FOUND);
+			return new ResponseEntity("No characters found", HttpStatus.NOT_FOUND);
 		return new ResponseEntity(characters, HttpStatus.FOUND);
 	}
 	
@@ -104,7 +104,7 @@ public class CharacterController {
 		List<Character> characters = new ArrayList<>();
 		characters = characterService.getAllCharactersFromGivenHouse(house);
 		if(characters.isEmpty())
-			return new ResponseEntity(characters, HttpStatus.NOT_FOUND);
+			return new ResponseEntity("No characters found", HttpStatus.NOT_FOUND);
 		return new ResponseEntity(characters, HttpStatus.FOUND);
 	}
 	
